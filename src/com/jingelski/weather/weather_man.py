@@ -1,0 +1,4 @@
+import requests
+
+response = requests.get("https://www.yahoo.com/news/_tdnews/api/resource/WeatherService;woeids=%5B973505%5D?bkt=up-news-2&device=desktop&feature=cacheContentCanvas%2CenableGDPRFooter%2CenableCMP%2CenableConsentData%2CenableGuceJs%2CenableGuceJsOverlay%2Clivecoverage%2CnewContentAttribution%2CvideoDocking%2Cuserintent%2CdeferModalCluster%2CautoNotif%2CbiggerStickyPlayer%2CcacheContentCanvasAds%2CcandidateTracker%2CcandidateTrackerRR%2CfauxdalNewLayout%2CnewLayout%2CntkFilmstrip%2CrivendellMigration%2Csidepic%2CsponsoredAds%2ClargeInStreamPlayer%2Cy20Desktop%2CenableVideoDocking%2CrecommendedVideos%2CoathPlayer&intl=us&lang=en-US&partner=none&prid=eod4jc5eobocs&region=US&site=fp&tz=Europe%2FBrussels&ver=0.0.10187&returnMeta=true")
+print(response)

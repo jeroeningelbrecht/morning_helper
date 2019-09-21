@@ -1,0 +1,6 @@
+#conda env create -f environment.yml
+name: morning_help
+dependencies:
+  - python
+  - requests
+  - pyyaml
