@@ -1,4 +1,26 @@
 import requests
+import pathlib
+import yaml
 
-response = requests.get("https://www.yahoo.com/news/_tdnews/api/resource/WeatherService;woeids=%5B973505%5D?bkt=up-news-2&device=desktop&feature=cacheContentCanvas%2CenableGDPRFooter%2CenableCMP%2CenableConsentData%2CenableGuceJs%2CenableGuceJsOverlay%2Clivecoverage%2CnewContentAttribution%2CvideoDocking%2Cuserintent%2CdeferModalCluster%2CautoNotif%2CbiggerStickyPlayer%2CcacheContentCanvasAds%2CcandidateTracker%2CcandidateTrackerRR%2CfauxdalNewLayout%2CnewLayout%2CntkFilmstrip%2CrivendellMigration%2Csidepic%2CsponsoredAds%2ClargeInStreamPlayer%2Cy20Desktop%2CenableVideoDocking%2CrecommendedVideos%2CoathPlayer&intl=us&lang=en-US&partner=none&prid=eod4jc5eobocs&region=US&site=fp&tz=Europe%2FBrussels&ver=0.0.10187&returnMeta=true")
-print(response)
+
+class WeatherMan:
+
+    def __init__(self):
+        project_root_path = pathlib.Path(__file__).parent.parent.parent.parent.parent  # fugly?!
+        config_file_path = project_root_path.joinpath('config.yml')
+
+        with open(config_file_path) as config:
+            data = yaml.load(config, Loader=yaml.FullLoader)
+            self.yahoo_weather_api_endpoint = data['yahoo_weather_api']['endpoint']
+
+        self.json_data = requests.get(self.yahoo_weather_api_endpoint).json()
+        self.__calc_temperatures()
+
+    def update(self) -> None:
+        self.json_data = requests.get(self.yahoo_weather_api_endpoint)
+        self.__calc_temperatures()
+
+    def __calc_temperatures(self):
+        self.current_temperature = (int(self.json_data['data']['weathers'][0]['observation']['temperature']['now']) - 32)/1.8
+        self.temperature_high = (int(self.json_data['data']['weathers'][0]['observation']['temperature']['high']) - 32)/1.8
+        self.temperature_low = (int(self.json_data['data']['weathers'][0]['observation']['temperature']['low']) - 32)/1.8
