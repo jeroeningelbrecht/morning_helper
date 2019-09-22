@@ -6,7 +6,7 @@ import yaml
 class WeatherMan:
 
     def __init__(self):
-        project_root_path = pathlib.Path(__file__).parent.parent.parent.parent.parent  # fugly?!
+        project_root_path = pathlib.Path(__file__).parent.parent.parent.parent  # fugly?!
         config_file_path = project_root_path.joinpath('config.yml')
 
         with open(config_file_path) as config:

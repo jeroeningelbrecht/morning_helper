@@ -2,14 +2,16 @@ import unittest
 import requests
 import yaml
 import pathlib
-from src.com.jingelski.weather.weather_man import WeatherMan
+from com.jingelski.weather.weather_man import WeatherMan
 
 
 class WeatherManTest(unittest.TestCase):
 
     def setUp(self) -> None:
-        project_root_path = pathlib.Path(__file__).parent.parent.parent.parent.parent  # fugly?!
-        config_file_path = project_root_path.joinpath('config.yml')
+        project_root_path = pathlib.Path(__file__).resolve().parent.parent.parent.parent.parent #fugly
+
+        config_file_path = project_root_path.joinpath('./config.yml')
+        print(config_file_path)
 
         with open(config_file_path) as config:
             data = yaml.load(config, Loader=yaml.FullLoader)
