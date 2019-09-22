@@ -1,6 +1,7 @@
 import requests
 import pathlib
 import yaml
+from com.jingelski.util.util import round_half_up
 
 
 class WeatherMan:
@@ -21,6 +22,6 @@ class WeatherMan:
         self.__calc_temperatures()
 
     def __calc_temperatures(self):
-        self.current_temperature = (int(self.json_data['data']['weathers'][0]['observation']['temperature']['now']) - 32)/1.8
-        self.temperature_high = (int(self.json_data['data']['weathers'][0]['observation']['temperature']['high']) - 32)/1.8
-        self.temperature_low = (int(self.json_data['data']['weathers'][0]['observation']['temperature']['low']) - 32)/1.8
+        self.current_temperature = round_half_up((float(self.json_data['data']['weathers'][0]['observation']['temperature']['now']) - 32)/1.8, 1)
+        self.temperature_high = round_half_up((float(self.json_data['data']['weathers'][0]['observation']['temperature']['high']) - 32)/1.8, 1)
+        self.temperature_low = round_half_up((float(self.json_data['data']['weathers'][0]['observation']['temperature']['low']) - 32)/1.8, 1)
