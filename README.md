@@ -15,7 +15,7 @@
 ## Run app.py
 This file takes care of the rest.
 As a result, you should see:
-* an analog clock
+* an analogue clock
 * current temperature
 * minimum predicted temperature for today
 * maximum predicted temperature for today
