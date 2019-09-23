@@ -7,10 +7,11 @@ def draw_clock_face(pen, clock_radius, start_x) -> None:
     pen.up()
     pen.goto(start_x, clock_radius)
     pen.setheading(180)
-    pen.color("green")
+    pen.fillcolor("yellow")
     pen.pendown()
+    pen.begin_fill()
     pen.circle(clock_radius)
-
+    pen.end_fill()
 
 def draw_clock_lines(pen, clock_radius, start_x) -> None:
     # draw the lines
@@ -149,6 +150,10 @@ class Clock:
         self.pen.pendown()
         self.pen.fd(self.MINUTE_HAND_LENGTH)
 
+        self.pen.penup()
+        self.pen.fd(self.CLOCK_RADIUS-self.MINUTE_HAND_LENGTH)
+        self.pen.dot(20, "blue")
+
     def _draw_second_hand(self, s) -> None:
         # draw the second hand
         self.pen.penup()
@@ -159,6 +164,10 @@ class Clock:
         self.pen.rt(angle)
         self.pen.pendown()
         self.pen.fd(self.SECOND_HAND_LENGTH)
+
+        self.pen.penup()
+        self.pen.fd(self.CLOCK_RADIUS - self.SECOND_HAND_LENGTH)
+        self.pen.dot(20, "red")
 
     def _write_temperature(self, pen):
         # write the temperatures
