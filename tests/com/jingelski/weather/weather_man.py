@@ -22,11 +22,17 @@ class WeatherManTest(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertIsNot(response.json(), '')
         self.assertIsNot('', response.json())
+
         temperature_json = response.json()['data']['weathers'][0]['observation']['temperature']
         self.assertIsNot(temperature_json, '')
         self.assertIsNot(temperature_json['now'], '')
         self.assertIsNot(temperature_json['high'], '')
         self.assertIsNot(temperature_json['low'], '')
+
+        observation_json = response.json()['data']['weathers'][0]['observation']
+        self.assertIsNot(observation_json, '')
+        self.assertIsNot(observation_json['precipitationProbability'], '')
+        self.assertIsNot(observation_json['windSpeed'], '')
 
     def test_weather_man(self):
         wm = WeatherMan()

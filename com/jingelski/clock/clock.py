@@ -3,42 +3,42 @@ import time
 from com.jingelski.weather.weather_man import WeatherMan
 
 
-def draw_clock_face(pen) -> None:
+def draw_clock_face(pen, clock_radius, start_x) -> None:
     pen.up()
-    pen.goto(0, 210)
+    pen.goto(start_x, clock_radius)
     pen.setheading(180)
     pen.color("green")
     pen.pendown()
-    pen.circle(210)
+    pen.circle(clock_radius)
 
 
-def draw_clock_lines(pen) -> None:
+def draw_clock_lines(pen, clock_radius, start_x) -> None:
     # draw the lines
     pen.up()
-    pen.goto(0, 0)
+    pen.goto(start_x, 0)
     pen.setheading(90)
 
     for hour in range(12):
-        # clock radius is 210
+        # clock radius
         # go forward 190
         # pen down and draw a line of 20 long to get to the 'edge circle' of the clock
 
-        pen.fd(190)
+        pen.fd(clock_radius-40)
         pen.pendown()
         # every line has a length of 20
-        pen.fd(20)
+        pen.fd(40)
         pen.penup()
 
-        pen.fd(15)
-        pen.write(str((lambda: 12, lambda: hour)[hour != 0]()), font=("Arial", 10, "bold"))
+        pen.fd(20)
+        pen.write(str((lambda: 12, lambda: hour)[hour != 0]()), font=("Arial", 16, "bold"))
 
         # draw the second marks in black
         pen.color("black")
 
         for second in range(4):
-            pen.goto(0, 0)
+            pen.goto(start_x, 0)
             pen.rt(6)
-            pen.fd(200)
+            pen.fd(clock_radius - 10)
             pen.pendown()
             pen.fd(10)
             pen.penup()
@@ -47,11 +47,21 @@ def draw_clock_lines(pen) -> None:
         pen.color("green")
         # 360°/60 lines = 1 line per 6° BUT 1 big line for every 5 mins and 4 smaller 'second' lines in between two
         # 5 minute lines
-        pen.goto(0, 0)
+        pen.goto(start_x, 0)
         pen.rt(6)
 
 
 class Clock:
+
+    MAX_WIDTH = 1600
+    MAX_HEIGHT = 900
+
+    CLOCK_RADIUS = 400
+    HOUR_HAND_LENGTH = 200
+    MINUTE_HAND_LENGTH = 300
+    SECOND_HAND_LENGTH = 200
+
+    CLOCK_START_X = -MAX_WIDTH / 2 + CLOCK_RADIUS + 30
 
     def __init__(self):
         self.weather_man = WeatherMan()
@@ -59,7 +69,7 @@ class Clock:
         # initiate the window
         self.window = turtle.Screen()
         self.window.bgcolor("#CCCCCC")
-        self.window.setup(width=1024, height=768)
+        self.window.setup(width=self.MAX_WIDTH, height=self.MAX_HEIGHT)
         self.window.title("Morning Helper")
         self.window.tracer(0)  # disable the clock animation
 
@@ -76,8 +86,8 @@ class Clock:
         self.static_clock_turtle_pen.pensize(3)
 
         # draw the clock skeleton
-        draw_clock_face(self.static_clock_turtle_pen)
-        draw_clock_lines(self.static_clock_turtle_pen)
+        draw_clock_face(self.static_clock_turtle_pen, self.CLOCK_RADIUS, self.CLOCK_START_X)
+        draw_clock_lines(self.static_clock_turtle_pen, self.CLOCK_RADIUS, self.CLOCK_START_X)
 
         # create a different turtle for the temperature information as this information only needs to get updated
         # once in a while
@@ -86,6 +96,9 @@ class Clock:
         self.temp_turtle_pen.speed(0)
         self.temp_turtle_pen.pensize(3)
         self._write_temperature(self.temp_turtle_pen)
+
+        # write precipitation and windspeed
+        self._write_weather(self.temp_turtle_pen)
 
         while True:
             h = int(time.strftime("%I"))
@@ -99,38 +112,40 @@ class Clock:
 
             self.pen.clear()
 
-    def _draw_hour_hand(self, h) -> None:
+    def _draw_hour_hand(self, h, m) -> None:
         # draw the hour hand
         self.pen.penup()
-        self.pen.goto(0, 0)
+        self.pen.goto(self.CLOCK_START_X, 0)
         self.pen.color("black")
         self.pen.setheading(90)
-        angle = (h / 12) * 360
+        # hour + (minutes/60) => hour hand does not remain static for an entire hour but gradually moves along while the
+        # minutes pass
+        angle = ((h + m/60) / 12) * 360
         self.pen.rt(angle)
         self.pen.pendown()
-        self.pen.fd(100)
+        self.pen.fd(self.HOUR_HAND_LENGTH)
 
     def _draw_minute_hand(self, m) -> None:
         # draw the minute hand
         self.pen.penup()
-        self.pen.goto(0, 0)
+        self.pen.goto(self.CLOCK_START_X, 0)
         self.pen.color("blue")
         self.pen.setheading(90)
         angle = (m / 60) * 360
         self.pen.rt(angle)
         self.pen.pendown()
-        self.pen.fd(150)
+        self.pen.fd(self.MINUTE_HAND_LENGTH)
 
     def _draw_second_hand(self, s) -> None:
         # draw the second hand
         self.pen.penup()
-        self.pen.goto(0, 0)
+        self.pen.goto(self.CLOCK_START_X, 0)
         self.pen.color("red")
         self.pen.setheading(90)
         angle = (s / 60) * 360
         self.pen.rt(angle)
         self.pen.pendown()
-        self.pen.fd(100)
+        self.pen.fd(self.SECOND_HAND_LENGTH)
 
     def _write_temperature(self, pen):
         # write the temperatures
@@ -147,7 +162,19 @@ class Clock:
         pen.write('MINIMUM TEMPERATUUR VANDAAG: ' + str(self.weather_man.temperature_low) + ' °C',
                   font=("Arial", 16, "bold"))
 
+    def _write_weather(self, pen):
+        #write the precipitation probability
+        pen.up()
+        pen.goto(-350, 290)
+        pen.write('KANS OP NEERSLAG KOMEND UUR: ' + str(self.weather_man.precipitationProbability) + '%',
+                  font=("Arial", 16, "bold"))
+
+        pen.up()
+        pen.goto(-350, 270)
+        pen.write('WINDSNELHEID NU: ' + str(self.weather_man.current_wind_speed) +'km/u',
+                  font=("Arial", 16, "bold"))
+
     def _draw_clock(self, h, m, s):
-        self._draw_hour_hand(h)
+        self._draw_hour_hand(h, m)
         self._draw_minute_hand(m)
         self._draw_second_hand(s)
