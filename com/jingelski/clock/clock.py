@@ -62,6 +62,7 @@ class Clock:
     SECOND_HAND_LENGTH = 200
 
     CLOCK_START_X = -MAX_WIDTH / 2 + CLOCK_RADIUS + 30
+    TEXT_START_X = 50
 
     def __init__(self):
         self.weather_man = WeatherMan()
@@ -95,6 +96,8 @@ class Clock:
         self.temp_turtle_pen.hideturtle()
         self.temp_turtle_pen.speed(0)
         self.temp_turtle_pen.pensize(3)
+
+        # write temperature data
         self._write_temperature(self.temp_turtle_pen)
 
         # write precipitation and windspeed
@@ -103,9 +106,19 @@ class Clock:
         while True:
             h = int(time.strftime("%I"))
             m = int(time.strftime("%M"))
-            s = int(time.strftime("%s"))
+            s = int(time.strftime("%S"))
 
             self._draw_clock(h, m, s)
+            # update weather information every 30 mins
+            if (m == 30 or m == 0) and s == 0:
+                self.weather_man.update()
+                self.weather_man.temperature_high = m
+                self.temp_turtle_pen.clear()
+                # write temperature data
+                self._write_temperature(self.temp_turtle_pen)
+                # write precipitation and windspeed
+                self._write_weather(self.temp_turtle_pen)
+
             self.window.update()
 
             time.sleep(1)
@@ -150,27 +163,27 @@ class Clock:
     def _write_temperature(self, pen):
         # write the temperatures
         pen.up()
-        pen.goto(-350, 350)
+        pen.goto(self.TEXT_START_X, 350)
         pen.write('TEMPERATUUR NU: ' + str(self.weather_man.current_temperature) + ' °C',
                   font=("Arial", 16, "bold"))
         pen.up()
-        pen.goto(-350, 330)
+        pen.goto(self.TEXT_START_X, 330)
         pen.write('MAXIMUM TEMPERATUUR VANDAAG: ' + str(self.weather_man.temperature_high) + ' °C',
                   font=("Arial", 16, "bold"))
         pen.up()
-        pen.goto(-350, 310)
+        pen.goto(self.TEXT_START_X, 310)
         pen.write('MINIMUM TEMPERATUUR VANDAAG: ' + str(self.weather_man.temperature_low) + ' °C',
                   font=("Arial", 16, "bold"))
 
     def _write_weather(self, pen):
         #write the precipitation probability
         pen.up()
-        pen.goto(-350, 290)
+        pen.goto(self.TEXT_START_X, 290)
         pen.write('KANS OP NEERSLAG KOMEND UUR: ' + str(self.weather_man.precipitationProbability) + '%',
                   font=("Arial", 16, "bold"))
 
         pen.up()
-        pen.goto(-350, 270)
+        pen.goto(self.TEXT_START_X, 270)
         pen.write('WINDSNELHEID NU: ' + str(self.weather_man.current_wind_speed) +'km/u',
                   font=("Arial", 16, "bold"))
 
